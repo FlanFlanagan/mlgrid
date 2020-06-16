@@ -48,6 +48,7 @@ class CNN(object):
         (thresh, bawimg) = cv2.threshold(resized, 127, 255, cv2.THRESH_BINARY)
         #show image
         cv2.imshow('b&w', bawimg)
+        print("press enter\n")
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         #turn data into proper format
@@ -176,4 +177,4 @@ class CNN(object):
         model = tf.keras.models.load_model("64x3-CNN.model")
         testimg = self.prepare('poly6_real_img.JPG', num_pix)
         prediction = model.predict_classes(testimg)
-        print(prediction) #TODO ensure the correct lables are getting outputted
+        print("this picture contains poly:", prediction) #TODO: ensure the correct lables are getting outputted
