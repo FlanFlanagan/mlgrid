@@ -20,40 +20,6 @@ import tensorflow as tf
 import time
 import cv2
 
-'''
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
-def prepare(filepath, num_pix):
-    img = cv2.imread(filepath)
-    grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # resize image
-    resized = cv2.resize(grayImage, (num_pix, num_pix), interpolation=cv2.INTER_AREA)
-    # turn b&w
-    (thresh, bawimg) = cv2.threshold(resized, 127, 255, cv2.THRESH_BINARY)
-    print(bawimg)# show image
-    cv2.imshow('b&w', bawimg)
-    print("press enter\n")
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    # turn data into proper format
-    piclist = bawimg.tolist()
-    flat_list = [item for sublist in piclist for item in sublist]
-    masterlist = []
-    mainlist = []
-    for j in flat_list:
-        if j == 0:
-            mainlist.append(0.)
-        else:
-            mainlist.append(1.)
-    tempa = chunks(mainlist, num_pix)
-    masterlist.append(list(tempa))
-    matrix = np.asarray(list(masterlist))
-    matrix = matrix / 255
-    matrix = np.expand_dims(matrix, axis=3)  # TensorFlow expects a channel dimension
-    matrix = tf.cast(matrix, tf.float32)
-    return matrix'''
 
 def main():
     # place Manhattan shape file intp gp dataframe
