@@ -176,7 +176,7 @@ def main():
     test_grid = []
     polys = []
     maxes = []
-    range_size = 20  # global range variable
+    range_size = 1  # global range variable
     slist = []
     for i in range(range_size):
         x1 = np.random.uniform(40., 80)
@@ -187,6 +187,7 @@ def main():
         # print(s)
         slist.append(s)
         polys.append(master_poly(x1, x2, x1, y1, y2, y1, s))  # change option for which gen_polyn<--- here!!!!!!!
+        print(polys[0].head())
         maxes.append((x1 + x2 + x1, y1 + y2 + y1))
 
     grids = []
@@ -203,7 +204,7 @@ def main():
                 poly = Polygon(((xs[x], ys[y]), (xs[x], ys[y + 1]), (xs[x + 1], ys[y + 1]), (xs[x + 1], ys[y])))
                 grid.append(poly)
         grids.append(gp.GeoDataFrame(geometry=grid))
-
+    print(grids[0].head())
     streets = []
     building_grid = []
     for i in range(len(grids)):
@@ -223,13 +224,13 @@ def main():
         pbf.accumulate_counts(strtree, street, 5)
         for j in street.index:
             grids[i].at[j, 'count'] = street.at[j, 'count']
-        with open('ANN_rawdata.txt', 'a') as outfile:
+        with open('ANN_rawtraindata.txt', 'a') as outfile:
             json.dump(list(grids[i]['count']), outfile)
         ax = x.plot()
         scheme = mc.Quantiles(street['count'], k=10)
         gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme,
                         legend_kwargs={'bbox_to_anchor': (1, 0.9)})
-        plt.savefig('pictures/x_'+str(i)+'.png')
+        plt.savefig('trainpictures/x_'+str(i)+'.png')
         plt.close()
 
     # rays.plot()

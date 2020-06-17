@@ -71,7 +71,7 @@ def vectorized_result(j, out):
 import ANN_network
 
 training_data, test_data = load_data_wrapper(361, 361)
-print(training_data.shape())
+# print(training_data.shape())
 for x,y in training_data:
     print(x,y)
 test_data = list(test_data)
