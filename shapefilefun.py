@@ -54,16 +54,18 @@ def prepare(filepath, num_pix):
     matrix = tf.cast(matrix, tf.float32)
     return matrix'''
 
+#place Manhattan shape file intp gp dataframe
 NewYork = gp.read_file('ManhattanBuildings.shp')
-# gplt.polyplot(NewYork, figsize=(8,4))
-print(NewYork.head())
+# print(NewYork.head())
 
-#create polygon
-polygon = Polygon([(-73.98708012650212, 40.736886547453686), (-73.98708012650212, 40.738999835727995), (-73.98479591049974, 40.738999835727995), (-73.98479591049974, 40.736886547453686), (-73.98708012650212, 40.736886547453686)])
-poly_gdf = gp.GeoDataFrame([1], geometry=[polygon], crs=NewYork.crs)
+#create polygons on New York City #TODO: create list of polygons so that multiple can be saved or created at once
+poly6_1 = Polygon([(-73.98708012650212, 40.736886547453686), (-73.98708012650212, 40.738999835727995), (-73.98479591049974, 40.738999835727995), (-73.98479591049974, 40.736886547453686), (-73.98708012650212, 40.736886547453686)])
+# poly_gdf = gp.GeoDataFrame([1], geometry=[poly6_1], crs=NewYork.crs)
 
+#clip NewYork to the different polygons
+NY_clipped = gp.clip(NewYork, poly6_1)
+print(type(NY_clipped))
 
-NY_clipped = gp.clip(NewYork, polygon)
 fig, ax = plt.subplots(figsize=(29, 29), frameon=False)
 # h = w = 1
 # fig.set_size_inches(h, w)

@@ -196,7 +196,7 @@ def main():
         pbf.accumulate_counts(strtree, street, 5)
         for j in street.index:
             grids[i].at[j, 'count'] = street.at[j, 'count']
-        with open('test.txt', 'a') as outfile:
+        with open('ANN_rawdata.txt', 'a') as outfile:
             json.dump(list(grids[i]['count']), outfile)
         ax = x.plot()
         #scheme = mc.Quantiles(street['count'], k=10)
@@ -221,7 +221,7 @@ def main():
         temp = (list(input_list[i]['count']), list(output_list[i]['count']))
 
     print(in_out_tuplist)
-    with open('input_output_trainingdata.json', 'w') as outfile:
+    with open('ANN_trainingdata.json', 'w') as outfile:
         json.dump(in_out_tuplist, outfile)
 
 

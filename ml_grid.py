@@ -223,7 +223,7 @@ def main():
         pbf.accumulate_counts(strtree, street, 5)
         for j in street.index:
             grids[i].at[j, 'count'] = street.at[j, 'count']
-        with open('test.txt', 'a') as outfile:
+        with open('ANN_rawdata.txt', 'a') as outfile:
             json.dump(list(grids[i]['count']), outfile)
         ax = x.plot()
         scheme = mc.Quantiles(street['count'], k=10)
@@ -235,7 +235,7 @@ def main():
     # rays.plot()
 
 #saves dataset to json file
-    os.remove("input_output_trainingdata.json")
+    os.remove("ANN_trainingdata.json")
     masterlist = []
     input_list = copy.deepcopy(grids)
     output_list = copy.deepcopy(grids)
@@ -249,7 +249,7 @@ def main():
                 input_list[i].at[j, 'count'] = -1  # wall
         temp = (list(input_list[i]['count']), list(output_list[i]['count']))
         masterlist.append(temp)
-    with open('input_output_trainingdata.json', 'a') as outfile:
+    with open('ANN_trainingdata.json', 'a') as outfile:
         json.dump(masterlist, outfile)
 
 #save black and white street images and their labels for CNN
