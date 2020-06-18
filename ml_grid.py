@@ -212,7 +212,7 @@ def main():
         streets.append(street)
         street['count'] = 0.0
         samplePoints = pbf.polygon_centroid_to_point(street)
-        rays = pbf.build_lines_from_point(samplePoints, 15, 40)
+        rays = pbf.build_lines_from_point(samplePoints, maxes[i][0]/3, 30)
         raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
         rays = rays.drop(raysWithBuildings.index.values.tolist())
         tree_list = list(rays['geometry']) + list(street['geometry'])

@@ -46,7 +46,7 @@ def master_poly():
     points = []
     points.append(poly6_1())
     # TODO: add polys to points list here......................
-    print(points)
+    # print(points)
     polys = []
     for i in points:
         polys.append(clippoly(NewYork, clipmaker(i[0], i[1], i[2], i[3])))
