@@ -14,7 +14,6 @@ import mapclassify as mc
 import json
 import copy
 import os
-import pprint
 
 #shape definitions
 
@@ -173,21 +172,18 @@ def grabCNNdata(grids, nxpixels):
 
 
 def main():
-    test_grid = []
     polys = []
     maxes = []
-    range_size = 1  # global range variable
+    range_size = 5  #global range variable
     slist = []
     for i in range(range_size):
-        x1 = np.random.uniform(40., 80)
-        x2 = np.random.uniform(0., 20)
-        y1 = np.random.uniform(40., 80)
-        y2 = np.random.uniform(0., 20)
+        x1 = np.random.uniform(10., 20)
+        x2 = np.random.uniform(0., 5)
+        y1 = np.random.uniform(10., 20)
+        y2 = np.random.uniform(0., 5)
         s = int(np.random.uniform(1, 13))  # random # between 1-12 (number of poly functions)
-        # print(s)
         slist.append(s)
-        polys.append(master_poly(x1, x2, x1, y1, y2, y1, s))  # change option for which gen_polyn<--- here!!!!!!!
-        print(polys[0].head())
+        polys.append(master_poly(x1, x2, x1, y1, y2, y1, s))
         maxes.append((x1 + x2 + x1, y1 + y2 + y1))
 
     grids = []
@@ -195,8 +191,8 @@ def main():
         grid = []
         x_max = maxes[i][0]
         y_max = maxes[i][1]
-        xpix = 39 #this is equal to number of lines - 1 (xpix = ypix for now)
-        ypix = 39
+        xpix = 29 #this is equal to number of lines - 1 (xpix = ypix for now)
+        ypix = 29
         xs = np.linspace(0, x_max, xpix + 1)
         ys = np.linspace(0, y_max, ypix + 1)
         for x in range(len(xs) - 1):
@@ -204,7 +200,7 @@ def main():
                 poly = Polygon(((xs[x], ys[y]), (xs[x], ys[y + 1]), (xs[x + 1], ys[y + 1]), (xs[x + 1], ys[y])))
                 grid.append(poly)
         grids.append(gp.GeoDataFrame(geometry=grid))
-    print(grids[0].head())
+
     streets = []
     building_grid = []
     for i in range(len(grids)):
@@ -216,7 +212,7 @@ def main():
         streets.append(street)
         street['count'] = 0.0
         samplePoints = pbf.polygon_centroid_to_point(street)
-        rays = pbf.build_lines_from_point(samplePoints, 20, 20)
+        rays = pbf.build_lines_from_point(samplePoints, 15, 40)
         raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
         rays = rays.drop(raysWithBuildings.index.values.tolist())
         tree_list = list(rays['geometry']) + list(street['geometry'])
@@ -227,13 +223,11 @@ def main():
         with open('ANN_rawtraindata.txt', 'a') as outfile:
             json.dump(list(grids[i]['count']), outfile)
         ax = x.plot()
-        scheme = mc.Quantiles(street['count'], k=10)
+        scheme = mc.Quantiles(street['count'], k=15)
         gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme,
                         legend_kwargs={'bbox_to_anchor': (1, 0.9)})
         plt.savefig('trainpictures/x_'+str(i)+'.png')
         plt.close()
-
-    # rays.plot()
 
 #saves dataset to json file
     os.remove("ANN_trainingdata.json")
@@ -266,22 +260,3 @@ if __name__ == '__main__':
     p = Process(target=main)
     p.start()
 
-
-'''
-for i in range(1000):
-    streets[i]['count']=0.0t
-    samplePoints = pbf.polygon_centroid_to_point(streets[i])
-    rays = pbf.build_lines_from_point(samplePoints, 200000, 36)
-    raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
-    rays = rays.drop(raysWithBuildings.index.values.tolist())
-    tree_list = list(rays['geometry']) + list(streets[i]['geometry'])
-    strtree=STRtree(tree_list)
-    pbf.accumulate_counts(strtree, streets[i], 4, lat_flag=False)
-    streets[i]['count'] = streets[i]['count']*1e9
-
-for i in range(1000):
-    ax = building_grid[i].plot(figsize=(50,50))
-    gplt.choropleth(streets[i], ax=ax, hue='count', legend=True)
-    plt.savefig('x_'+str(i)+'.png')
-    plt.close()
-'''
