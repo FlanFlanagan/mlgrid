@@ -174,7 +174,7 @@ def grabCNNdata(grids, nxpixels):
 def main():
     polys = []
     maxes = []
-    range_size = 5  #global range variable
+    range_size = 2000  #global range variable
     slist = []
     for i in range(range_size):
         x1 = np.random.uniform(10., 20)
@@ -213,7 +213,11 @@ def main():
         street['count'] = 0.0
         samplePoints = pbf.polygon_centroid_to_point(street)
         rays = pbf.build_lines_from_point(samplePoints, maxes[i][0]/3, 30)
-        raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
+        try:
+            raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
+        except:
+            print("An exception has occured: there were not enough bins which contained buildings")
+            continue
         rays = rays.drop(raysWithBuildings.index.values.tolist())
         tree_list = list(rays['geometry']) + list(street['geometry'])
         strtree = STRtree(tree_list)
@@ -230,7 +234,7 @@ def main():
         plt.close()
 
 #saves dataset to json file
-    os.remove("ANN_trainingdata.json")
+    # os.remove("ANN_trainingdata.json")
     masterlist = []
     input_list = copy.deepcopy(grids)
     output_list = copy.deepcopy(grids)
@@ -248,10 +252,10 @@ def main():
         json.dump(masterlist, outfile)
 
 #save black and white street images and their labels for CNN
-    os.remove("CNNdata_images.json")
+    # os.remove("CNNdata_images.json")
     with open('CNNdata_images.json', 'a') as outfile:
         json.dump(grabCNNdata(grids, xpix), outfile)
-    os.remove("CNNdata_labels.json")
+    # os.remove("CNNdata_labels.json")
     with open('CNNdata_labels.json', 'a') as outfile:
         json.dump(slist, outfile)
 

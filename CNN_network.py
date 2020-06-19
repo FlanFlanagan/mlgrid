@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.datasets import mnist
 import time
 import cv2
+import os
 
 
 np.random.seed(0)
@@ -33,6 +34,7 @@ class CNN(object):
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy')
         plt.grid(True)
+        plt.show()
 
     def chunks(self, lst, n):
         """Yield successive n-sized chunks from lst."""
@@ -47,10 +49,10 @@ class CNN(object):
         #turn b&w
         (thresh, bawimg) = cv2.threshold(resized, 127, 255, cv2.THRESH_BINARY)
         #show image
-        cv2.imshow('b&w', bawimg)
-        print("press enter\n")
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # cv2.imshow('b&w', bawimg)
+        # print("press enter\n")
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
         #turn data into proper format
         piclist = bawimg.tolist()
         flat_list = [item for sublist in piclist for item in sublist]
@@ -167,14 +169,22 @@ class CNN(object):
         # Plot results
         self.plot_results(history)
 
-        #--------------------------------------------------------------My add-ons----------------------------------------------------------
-        #clear previous model
+        # clear previous model
         tf.keras.backend.clear_session()
 
-        #save model
+        # save model
         model.save('64x3-CNN.model')
-
         model = tf.keras.models.load_model("64x3-CNN.model")
-        testimg = self.prepare('poly6_real_img.JPG', num_pix)
-        prediction = model.predict_classes(testimg)
-        print("this picture contains poly:", prediction) #TODO: ensure the correct lables are getting outputted
+
+        return model, num_pix
+
+    def testCNN(self, model, num_pix):
+
+        directory = os.fsencode('CNN_testpictures')
+        test_imgs = []
+        for file in os.listdir(directory):
+            filename = os.fsdecode(file)
+            test_imgs.append(self.prepare('CNN_testpictures/'+filename, num_pix)) #'CNN_testpictures/poly6_1.jpg'
+        for i in range(len(test_imgs)):
+            prediction = model.predict_classes(test_imgs[i])
+            print('image x_'+str(i)+'', 'contains poly:', prediction, '\n')
