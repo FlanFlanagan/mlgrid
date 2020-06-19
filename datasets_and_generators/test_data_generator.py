@@ -126,25 +126,24 @@ def master_poly():
     # points is the list that with store all the poly clip points
     points = []
     points.append(poly1_1())
-    # points.append(poly2_1())
-    # points.append(poly4_1())
-    # points.append(poly5_1())
-    # points.append(poly6_1())
-    # points.append(poly6_2())
-    # points.append(poly7_1())
-    # points.append(poly8or9_1())
-    # points.append(poly9or8_1())
-    # points.append(poly10_1())
-    # points.append(poly12_1())
-    # points.append(poly12_2())
+    points.append(poly2_1())
+    points.append(poly4_1())
+    points.append(poly5_1())
+    points.append(poly6_1())
+    points.append(poly6_2())
+    points.append(poly7_1())
+    points.append(poly8or9_1())
+    points.append(poly9or8_1())
+    points.append(poly10_1())
+    points.append(poly12_1())
+    points.append(poly12_2())
     #add polys to points list here......................
     polys = []
     for i in points:
         polys.append(clippoly(NewYork, clipmaker(i[0], i[1], i[2], i[3])))
     for j in range(len(polys)):
         polys[j].plot()
-        plt.savefig('CNN_testimages/x_' + str(j) + '.jpg')  # creating test images for CNN
-        #TODO: write images to files properly
+        plt.savefig('../CNN_testimages/x_' + str(j) + '.jpg')  # creating test images for CNN
         plt.close()
     return polys, points
 
@@ -177,7 +176,7 @@ def main():
         streets.append(street)
         street['count'] = 0.0
         samplePoints = pbf.polygon_centroid_to_point(street)
-        rays = pbf.build_lines_from_point(samplePoints, .0008, 30)
+        rays = pbf.build_lines_from_point(samplePoints, (ranges[i][2]-ranges[i][0])/3, 30) #.0008
         raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
         rays = rays.drop(raysWithBuildings.index.values.tolist())
         tree_list = list(rays['geometry']) + list(street['geometry'])
@@ -191,7 +190,7 @@ def main():
         scheme = mc.Quantiles(street['count'], k=15)
         gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme,
                         legend_kwargs={'bbox_to_anchor': (1, 0.9)})
-        plt.savefig('ANN_testimages/x_' + str(i) + '.png')
+        plt.savefig('../ANN_testimages/x_'+str(i)+'.png')
         plt.close()
 
     # saves dataset to json file
