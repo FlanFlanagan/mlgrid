@@ -3,10 +3,10 @@ import json
 import numpy as np
 
 def read_data_set():
-    with open('CNNdata_images.json', 'r') as openfile:
+    with open('datasets_and_generators/CNNdata_images.json', 'r') as openfile:
         masterlist = json.load(openfile)
     masterarray = np.array(list(masterlist))
-    with open('CNNdata_labels.json', 'r') as openfile:
+    with open('datasets_and_generators/CNNdata_labels.json', 'r') as openfile:
         masterlabels = json.load(openfile)
     labels = np.array(list(masterlabels))
     # split data

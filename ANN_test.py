@@ -10,7 +10,7 @@ import numpy as np
 
 def read_data_set():
     # training data------------------------------
-    with open('ANN_trainingdata.json', 'r') as openfile:
+    with open('datasets_and_generators/ANN_trainingdata.json', 'r') as openfile:
         mastertrainlist = json.load(openfile)
     #put in list of tuples
     mastertrainlist_tup = []
@@ -18,7 +18,7 @@ def read_data_set():
         temp = (np.array(mastertrainlist[i][0]), np.array(mastertrainlist[i][1]))
         mastertrainlist_tup.append(temp)
     # testing data-------------------------------
-    with open('ANN_testdata.json', 'r') as openfile:
+    with open('datasets_and_generators/ANN_testdata.json', 'r') as openfile:
         mastertestlist = json.load(openfile)
     #put in list of tuples
     mastertestlist_tup = []

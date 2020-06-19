@@ -180,11 +180,11 @@ class CNN(object):
 
     def testCNN(self, model, num_pix):
 
-        directory = os.fsencode('CNN_testpictures')
+        directory = os.fsencode('CNN_testimages')
         test_imgs = []
         for file in os.listdir(directory):
             filename = os.fsdecode(file)
-            test_imgs.append(self.prepare('CNN_testpictures/'+filename, num_pix)) #'CNN_testpictures/poly6_1.jpg'
+            test_imgs.append(self.prepare('CNN_testimages/'+filename, num_pix)) #'CNN_testimages/poly6_1.jpg'
         for i in range(len(test_imgs)):
             prediction = model.predict_classes(test_imgs[i])
             print('image x_'+str(i)+'', 'contains poly:', prediction, '\n')
