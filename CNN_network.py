@@ -48,11 +48,13 @@ class CNN(object):
         resized = cv2.resize(grayImage, (num_pix, num_pix), interpolation=cv2.INTER_AREA)
         #turn b&w
         (thresh, bawimg) = cv2.threshold(resized, 127, 255, cv2.THRESH_BINARY)
+
         #show image
         # cv2.imshow('b&w', bawimg)
         # print("press enter\n")
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
+
         #turn data into proper format
         piclist = bawimg.tolist()
         flat_list = [item for sublist in piclist for item in sublist]

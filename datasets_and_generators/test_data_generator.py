@@ -55,12 +55,14 @@ def poly6_1():
     y_max = 40.738999835727995
     return [x_min, y_min, x_max, y_max]
 
+
 def poly6_2():
     x_min = -73.98577258157727
     y_min = 40.732374335722696
     x_max = -73.98209379753659
     y_max = 40.73526967501397
     return [x_min, y_min, x_max, y_max]
+
 
 def poly7_1():
     x_min = -74.01030028529303
@@ -69,12 +71,14 @@ def poly7_1():
     y_max = 40.72066867985905
     return [x_min, y_min, x_max, y_max]
 
+
 def poly8or9_1():
     x_min = -73.99187739737646
     y_min = 40.7325038982852
     x_max = -73.9903432804347
     y_max = 40.734636695009115
     return [x_min, y_min, x_max, y_max]
+
 
 def poly9or8_1():
     x_min = -73.99187739737646
@@ -83,12 +87,14 @@ def poly9or8_1():
     y_max = 40.7339940591359
     return [x_min, y_min, x_max, y_max]
 
+
 def poly10_1():
     x_min = -73.9900583314379
     y_min = 40.72940971602
     x_max = -73.98807894640817
     y_max = 40.73054036923789
     return [x_min, y_min, x_max, y_max]
+
 
 def poly12_1():
     x_min = -73.98657426755938
@@ -97,6 +103,7 @@ def poly12_1():
     y_max = 40.759315510560945
     return [x_min, y_min, x_max, y_max]
 
+
 def poly12_2():
     x_min = -74.00997699640905
     y_min = 40.71517261147056
@@ -104,7 +111,8 @@ def poly12_2():
     y_max = 40.71666092335309
     return [x_min, y_min, x_max, y_max]
 
-#add new poly definitions here
+
+# add new poly definitions here
 
 def clipmaker(x_min, y_min, x_max, y_max):
     return Polygon([(x_min, y_min), (x_min, y_max), (x_max, y_max), (x_max, y_min), (x_min, y_min)])
@@ -117,6 +125,18 @@ def clippoly(master, clipper):
     for index, row in NY_clipped.iterrows():
         poly.append(row['geometry'])
     return gp.GeoDataFrame(geometry=poly)
+
+
+def save_image(data, fn):
+    data.plot(color="black", edgecolor='black')
+    plt.gca().set_axis_off()
+    plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
+                        hspace=0, wspace=0)
+    plt.margins(0, 0)
+    plt.gca().xaxis.set_major_locator(plt.NullLocator())
+    plt.gca().yaxis.set_major_locator(plt.NullLocator())
+    plt.savefig(fn, bbox_inches='tight', pad_inches=-0.0)
+    plt.close()
 
 
 def master_poly():
@@ -137,14 +157,12 @@ def master_poly():
     points.append(poly10_1())
     points.append(poly12_1())
     points.append(poly12_2())
-    #add polys to points list here......................
+    # add polys to points list here......................
     polys = []
     for i in points:
         polys.append(clippoly(NewYork, clipmaker(i[0], i[1], i[2], i[3])))
     for j in range(len(polys)):
-        polys[j].plot()
-        plt.savefig('../CNN_testimages/x_' + str(j) + '.jpg')  # creating test images for CNN
-        plt.close()
+        save_image(polys[j], '../CNN_testimages/x_' + str(j) + '.jpg')
     return polys, points
 
 
@@ -176,7 +194,7 @@ def main():
         streets.append(street)
         street['count'] = 0.0
         samplePoints = pbf.polygon_centroid_to_point(street)
-        rays = pbf.build_lines_from_point(samplePoints, (ranges[i][2]-ranges[i][0])/3, 30) #.0008
+        rays = pbf.build_lines_from_point(samplePoints, (ranges[i][2] - ranges[i][0]) / 3, 30)  # .0008
         raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
         rays = rays.drop(raysWithBuildings.index.values.tolist())
         tree_list = list(rays['geometry']) + list(street['geometry'])
@@ -190,7 +208,8 @@ def main():
         scheme = mc.Quantiles(street['count'], k=15)
         gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme,
                         legend_kwargs={'bbox_to_anchor': (1, 0.9)})
-        plt.savefig('../ANN_testimages/x_'+str(i)+'.png')
+        plt.savefig('../ANN_testimages/x_' + str(i) + '.png')
+
         plt.close()
 
     # saves dataset to json file
@@ -210,6 +229,7 @@ def main():
         masterlist.append(temp)
     with open('ANN_testdata.json', 'a') as outfile:
         json.dump(masterlist, outfile)
+
 
 if __name__ == '__main__':
     freeze_support()
