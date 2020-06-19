@@ -47,10 +47,11 @@ def load_data_wrapper(inp, out):
     code."""
     tr_d, te_d = read_data_set()
     training_inputs = [np.reshape(x, (inp, 1)) for x in tr_d[0]]
-    training_results = [y for y in tr_d[1]]
+    training_results = [np.reshape(y, (inp, 1)) for y in tr_d[1]]
     training_data = zip(training_inputs, training_results)
     test_inputs = [np.reshape(x, (inp, 1)) for x in te_d[0]]
-    test_data = zip(test_inputs, te_d[1])
+    testing_results = [np.reshape(y, (inp, 1)) for y in te_d[1]]
+    test_data = zip(test_inputs, training_results)
     return (training_data, test_data)
 
 def vectorized_result(j, out):
@@ -71,9 +72,6 @@ def vectorized_result(j, out):
 import network
 
 training_data, test_data = load_data_wrapper(361, 361)
-print(len(training_data))
-for x,y in training_data:
-    print(x,y)
 test_data = list(test_data)
 net = network.Network([361, 100, 100, 361])
 net.SGD(training_data, 30, 5, -0.4, test_data=test_data)
