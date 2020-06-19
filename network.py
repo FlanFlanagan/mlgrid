@@ -147,7 +147,7 @@ class Network(object):
         #print(test_results[0])
         dist = 0
         for x,y in test_results:
-            dist+=np.linalg.norm(x-y)
+            dist+=(np.linalg.norm(x-y)/len(x))
         return dist
 
     def cost_derivative(self, output_activations, y):
