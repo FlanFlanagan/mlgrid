@@ -3,10 +3,11 @@
 This is a rewrite of the network class for the Artifical Neural Network class
 at Colorado School of Mines
 """
-#import build in libraries 
+# import build in libraries
 import random
-#import third party libraries
+# import third party libraries
 import numpy as np
+
 
 class Network(object):
 
@@ -25,19 +26,19 @@ class Network(object):
         self.sizes = sizes
         self.biases = []
         self.weights = []
-        #Generate biases for all but the input neurons
+        # Generate biases for all but the input neurons
         for y in sizes[1:]:
-            self.biases.append(np.random.randn(y,1))
-        #Generate weights for all but input and output neurons
-        for x,y in zip(sizes[:-1], sizes[1:]):
-            self.weights.append(np.random.randn(y,x))
-            
+            self.biases.append(np.random.randn(y, 1))
+        # Generate weights for all but input and output neurons
+        for x, y in zip(sizes[:-1], sizes[1:]):
+            self.weights.append(np.random.randn(y, x))
+
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
         for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a)+b)
+            a = sigmoid(np.dot(w, a) + b)
         return a
-    
+
     def SGD(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
         """Train the neural network using mini-batch stochastic
@@ -48,30 +49,30 @@ class Network(object):
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
-        
-        #convert training set to list and store length
+
+        # convert training set to list and store length
         training_data = list(training_data)
         n = len(training_data)
-        
+
         # if there is test data, convert to list and store length
         if test_data:
             test_data = list(test_data)
             n_test = len(test_data)
-        
+
         # If there are epochs divide the training sets up into batches
         for j in range(epochs):
             # randomly shuffle training data
             random.shuffle(training_data)
             mini_batches = []
-            #create the mini batches
+            # create the mini batches
             for k in range(0, n, mini_batch_size):
-                mini_batches.append(training_data[k:k+mini_batch_size])
-            #perform gradient descent to each batch through update function. 
+                mini_batches.append(training_data[k:k + mini_batch_size])
+            # perform gradient descent to each batch through update function.
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
             if test_data:
                 x = self.evaluate(test_data)
-                print("Epoch {} : {} / {}".format(j,x,n_test));
+                print("Epoch {} : {} / {}".format(j, x, n_test));
             else:
                 print("Epoch {} complete".format(j))
         return x
@@ -86,17 +87,17 @@ class Network(object):
         for x, y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             for i in range(len(nabla_b)):
-                nabla_b[i] = nabla_b[i]+delta_nabla_b[i]
+                nabla_b[i] = nabla_b[i] + delta_nabla_b[i]
             for i in range(len(nabla_w)):
-                nabla_w[i] = nabla_w[i]+delta_nabla_w[i]
+                nabla_w[i] = nabla_w[i] + delta_nabla_w[i]
         for i in range(len(self.weights)):
             w = self.weights[i]
             nw = nabla_w[i]
-            self.weights[i] = w-(eta/len(mini_batch))*nw
+            self.weights[i] = w - (eta / len(mini_batch)) * nw
         for i in range(len(self.biases)):
             b = self.biases[i]
             nb = nabla_b[i]
-            self.biases[i] = b-(eta/len(mini_batch))*nb
+            self.biases[i] = b - (eta / len(mini_batch)) * nb
 
     def backprop(self, x, y):
         """Return a tuple ``(nabla_b, nabla_w)`` representing the
@@ -110,16 +111,16 @@ class Network(object):
             nabla_w.append(np.zeros(w.shape))
         # feedforward
         activation = x
-        activations = [x] # list to store all the activations, layer by layer
-        zs = [] # list to store all the z vectors, layer by layer
+        activations = [x]  # list to store all the activations, layer by layer
+        zs = []  # list to store all the z vectors, layer by layer
         for b, w in zip(self.biases, self.weights):
-            z = np.dot(w, activation)+b
+            z = np.dot(w, activation) + b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
         # backward pass
         delta = self.cost_derivative(activations[-1], y) * \
-            sigmoid_prime(zs[-1])
+                sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
         # Note that the variable l in the loop below is used a little
@@ -131,9 +132,9 @@ class Network(object):
         for l in range(2, self.num_layers):
             z = zs[-l]
             sp = sigmoid_prime(z)
-            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
+            delta = np.dot(self.weights[-l + 1].transpose(), delta) * sp
             nabla_b[-l] = delta
-            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
+            nabla_w[-l] = np.dot(delta, activations[-l - 1].transpose())
         return (nabla_b, nabla_w)
 
     def evaluate(self, test_data):
@@ -141,31 +142,27 @@ class Network(object):
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
-        test_results = []
-        for x,y in test_data:
-            test_results.append((np.argmax(self.feedforward(x)), y))
-        successes = 0
-        for x,y in test_results:
-            if x==y:
-                successes += 1
-        return successes
+        test_results = [(self.feedforward(x), y)
+                        for (x, y) in test_data]
+        # print('results')
+        # print(test_results[0])
+        dist = 0
+        for x, y in test_results:
+            dist += (np.linalg.norm(x - y) / len(x))
+        return dist
 
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
         \partial a for the output activations."""
-        return 2*(output_activations-y)
+        return 2 * (output_activations - y)
+
 
 #### Miscellaneous functions
 def sigmoid(z):
     """The sigmoid function."""
-    return 1.0/(1.0+np.exp(-z))
+    return 1.0 / (1.0 + np.exp(-z))
+
 
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
-    return sigmoid(z)*(1-sigmoid(z))
-
-
-
-
-
-
+    return sigmoid(z) * (1 - sigmoid(z))

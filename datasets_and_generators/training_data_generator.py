@@ -252,11 +252,11 @@ def main():
         json.dump(masterlist, outfile)
 
 #save black and white street images and their labels for CNN
-    # os.remove("CNNdata_images.json")
-    with open('datasets_and_generators/CNNdata_images.json', 'a') as outfile:
+    # os.remove("CNN_trainingimages.json")
+    with open('datasets_and_generators/CNN_trainingimages.json', 'a') as outfile:
         json.dump(grabCNNdata(grids, xpix), outfile)
-    # os.remove("CNNdata_labels.json")
-    with open('datasets_and_generators/CNNdata_labels.json', 'a') as outfile:
+    # os.remove("CNN_traininglabels.json")
+    with open('datasets_and_generators/CNN_traininglabels.json', 'a') as outfile:
         json.dump(slist, outfile)
 
 if __name__ == '__main__':

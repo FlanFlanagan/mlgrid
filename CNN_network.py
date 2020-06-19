@@ -4,18 +4,21 @@ from tensorflow.keras.datasets import mnist
 import time
 import cv2
 import os
-
+from sklearn.ensemble import RandomForestClassifier
+from keras.regularizers import l2
 
 np.random.seed(0)
 tf.random.set_seed(0)
 
 import matplotlib.pyplot as plt
+
+
 # %matplotlib inline
 
 class CNN(object):
 
     def plot_results(self, history):
-        epoch_num = np.arange(1, len(history.history['loss'])+1)
+        epoch_num = np.arange(1, len(history.history['loss']) + 1)
 
         plt.figure(figsize=(15, 5))
 
@@ -46,16 +49,16 @@ class CNN(object):
         grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # resize image
         resized = cv2.resize(grayImage, (num_pix, num_pix), interpolation=cv2.INTER_AREA)
-        #turn b&w
+        # turn b&w
         (thresh, bawimg) = cv2.threshold(resized, 127, 255, cv2.THRESH_BINARY)
 
-        #show image
+        # show image
         # cv2.imshow('b&w', bawimg)
         # print("press enter\n")
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
 
-        #turn data into proper format
+        # turn data into proper format
         piclist = bawimg.tolist()
         flat_list = [item for sublist in piclist for item in sublist]
         masterlist = []
@@ -68,7 +71,7 @@ class CNN(object):
         tempa = self.chunks(mainlist, num_pix)
         masterlist.append(list(tempa))
         matrix = np.asarray(list(masterlist))
-        matrix = matrix / 255
+        # matrix = matrix / 255
         matrix = np.expand_dims(matrix, axis=3)  # TensorFlow expects a channel dimension
         matrix = tf.cast(matrix, tf.float32)
         return matrix
@@ -88,35 +91,28 @@ class CNN(object):
         n_train = len(images_train)
         images_train = images_train[0:n_train]
         labels_train = labels_train[0:n_train]
-        num_pix = len(images_train[0][0]) #assuming a square
+        num_pix = len(images_train[0][0])  # assuming a square
 
         n_test = len(images_train)
         images_test = images_test[0:n_test]
         labels_test = labels_test[0:n_test]
 
         ## You will not need to run this cell more than once, or cut/paste it elsewhere
-        plt.figure(figsize=(8*2, 2*2))
+        plt.figure(figsize=(8 * 2, 2 * 2))
         for i in range(16):
-            plt.subplot(2, 8, i+1)
+            plt.subplot(2, 8, i + 1)
             plt.imshow(images_train[i], cmap='gray')
 
         # Create TensorFlow Dataset objects to hold train and test data.
-        images_train = images_train/255
-        images_train = np.expand_dims(images_train, axis=3) # TensorFlow expects a channel dimension
+        images_train = images_train / 255
+        images_train = np.expand_dims(images_train, axis=3)  # TensorFlow expects a channel dimension
         images_train = tf.cast(images_train, tf.float32)
         labels_train = tf.cast(labels_train, tf.float32)
         dataset_train = tf.data.Dataset.from_tensor_slices((images_train, labels_train))
 
-        images_test = images_test/255
-        # print(images_test)
-        # print(type(images_test))
-        # print(images_test.shape)
-        images_test = np.expand_dims(images_test, axis=3) # TensorFlow expects a channel dimension
-        # print(images_test)
-        # print(images_test.shape)
+        images_test = images_test / 255
+        images_test = np.expand_dims(images_test, axis=3)  # TensorFlow expects a channel dimension
         images_test = tf.cast(images_test, tf.float32)
-        # print(images_test)
-        # print(images_test.shape)
         labels_test = tf.cast(labels_test, tf.float32)
         dataset_test = tf.data.Dataset.from_tensor_slices((images_test, labels_test))
 
@@ -133,9 +129,9 @@ class CNN(object):
         dataset_test = dataset_test.prefetch(tf.data.experimental.AUTOTUNE)
 
         ## This is the baseline model. Only modify it after copying it to cells further below.
-        num_kernels = 4
-        dense_layer_neurons = 64
-        kernels_size = (3, 3)
+        num_kernels = 3 #originally 3
+        dense_layer_neurons = 64 #originally 64
+        kernels_size = (3,3) #originally 3,3
         model = tf.keras.models.Sequential([
             tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu'),
             tf.keras.layers.MaxPool2D(pool_size=(2, 2), padding='same'),
@@ -145,10 +141,10 @@ class CNN(object):
 
             tf.keras.layers.Flatten(),
 
-            tf.keras.layers.Dense(dense_layer_neurons, activation='relu'),
+            tf.keras.layers.Dense(dense_layer_neurons, activation='relu'), #, kernel_regularizer=l2(0.0001), bias_regularizer=l2(0.0001)
             tf.keras.layers.Dense(13)
+            #TODO: look into this-> machinelearningmastery.com/how-to-configure-image-data-augmentation-when-training-deep-learning-neural-networks/
         ])
-
 
         # Do not change any arguments in the call to model.compile()
         model.compile(
@@ -157,10 +153,8 @@ class CNN(object):
             metrics=['accuracy'],
         )
 
-
-
         # Do not change any arguments in the call to model.fit()
-        epochs = 30
+        epochs = 30 #originally 30
         t = time.time()
         history = model.fit(dataset_train,
                             epochs=epochs,
@@ -175,8 +169,8 @@ class CNN(object):
         tf.keras.backend.clear_session()
 
         # save model
-        model.save('64x3-CNN.model')
-        model = tf.keras.models.load_model("64x3-CNN.model")
+        model.save('CNN_model.model')
+        model = tf.keras.models.load_model("CNN_model.model")
 
         return model, num_pix
 
@@ -184,9 +178,18 @@ class CNN(object):
 
         directory = os.fsencode('CNN_testimages')
         test_imgs = []
+        filename = []
         for file in os.listdir(directory):
-            filename = os.fsdecode(file)
-            test_imgs.append(self.prepare('CNN_testimages/'+filename, num_pix)) #'CNN_testimages/poly6_1.jpg'
-        for i in range(len(test_imgs)):
-            prediction = model.predict_classes(test_imgs[i])
-            print('image x_'+str(i)+'', 'contains poly:', prediction, '\n')
+            filename.append(os.fsdecode(file))
+        for i in filename:
+            test_imgs.append(self.prepare('CNN_testimages/'+str(i)+'', num_pix))  # 'CNN_testimages/poly6_1.jpg'
+
+
+        # report outcomes
+        prediction = []
+        for j in test_imgs:
+            # print(j)
+            prediction.append(model.predict_classes(j))
+            # print(prediction)
+        for k in range(len(prediction)):
+            print('image ' + str(filename[k]) + '', 'contains poly: '+str(prediction[k])+'\n')

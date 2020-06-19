@@ -21,7 +21,8 @@ def poly1_1():
     y_min = 40.7479771463825
     x_max = -73.98398531682531
     y_max = 40.74901713319052
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly1_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly2_1():
@@ -29,7 +30,8 @@ def poly2_1():
     y_min = 40.72925502438974
     x_max = -73.9878500933199
     y_max = 40.73006272599238
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly2_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly4_1():
@@ -37,7 +39,8 @@ def poly4_1():
     y_min = 40.74089665338382
     x_max = -73.99462691943303
     y_max = 40.74505876812792
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly4_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly5_1():
@@ -45,7 +48,8 @@ def poly5_1():
     y_min = 40.729550854778644
     x_max = -73.98548539656309
     y_max = 40.7309091095344
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly5_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly6_1():
@@ -53,7 +57,8 @@ def poly6_1():
     y_min = 40.736886547453686
     x_max = -73.98479591049974
     y_max = 40.738999835727995
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly6_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly6_2():
@@ -61,7 +66,8 @@ def poly6_2():
     y_min = 40.732374335722696
     x_max = -73.98209379753659
     y_max = 40.73526967501397
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly6_2.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly7_1():
@@ -69,7 +75,8 @@ def poly7_1():
     y_min = 40.71870248810824
     x_max = -74.00864686326192
     y_max = 40.72066867985905
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly7_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly8or9_1():
@@ -77,7 +84,8 @@ def poly8or9_1():
     y_min = 40.7325038982852
     x_max = -73.9903432804347
     y_max = 40.734636695009115
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly8or9_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly9or8_1():
@@ -85,7 +93,8 @@ def poly9or8_1():
     y_min = 40.73307639346226
     x_max = -73.9903681093166
     y_max = 40.7339940591359
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly9or8_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly10_1():
@@ -93,7 +102,8 @@ def poly10_1():
     y_min = 40.72940971602
     x_max = -73.98807894640817
     y_max = 40.73054036923789
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly10_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly12_1():
@@ -101,7 +111,8 @@ def poly12_1():
     y_min = 40.75751315956297
     x_max = -73.98398914368272
     y_max = 40.759315510560945
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly12_1.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 def poly12_2():
@@ -109,7 +120,8 @@ def poly12_2():
     y_min = 40.71517261147056
     x_max = -74.00802781186117
     y_max = 40.71666092335309
-    return [x_min, y_min, x_max, y_max]
+    name = 'poly12_2.jpg'
+    return [x_min, y_min, x_max, y_max, name]
 
 
 # add new poly definitions here
@@ -162,7 +174,7 @@ def master_poly():
     for i in points:
         polys.append(clippoly(NewYork, clipmaker(i[0], i[1], i[2], i[3])))
     for j in range(len(polys)):
-        save_image(polys[j], '../CNN_testimages/x_' + str(j) + '.jpg')
+        save_image(polys[j], '../CNN_testimages/'+str(points[j][4])+'')
     return polys, points
 
 
