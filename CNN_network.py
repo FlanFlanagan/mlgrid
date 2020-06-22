@@ -141,7 +141,7 @@ class CNN(object):
 
             tf.keras.layers.Flatten(),
 
-            tf.keras.layers.Dense(dense_layer_neurons, activation='relu'), #, kernel_regularizer=l2(0.0001), bias_regularizer=l2(0.0001)
+            tf.keras.layers.Dense(dense_layer_neurons, activation='relu', kernel_regularizer=l2(0.0001), bias_regularizer=l2(0.0005)), #
             tf.keras.layers.Dense(13)
             #TODO: look into this-> machinelearningmastery.com/how-to-configure-image-data-augmentation-when-training-deep-learning-neural-networks/
         ])
