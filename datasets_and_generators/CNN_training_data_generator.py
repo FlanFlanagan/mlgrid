@@ -174,7 +174,7 @@ def grabCNNdata(grids, nxpixels):
 def main():
     polys = []
     maxes = []
-    range_size = 2000  #global range variable
+    range_size = 10000  #global range variable
     slist = []
     for i in range(range_size):
         x1 = np.random.uniform(10., 20)
@@ -210,22 +210,11 @@ def main():
         street = grids[i].drop(x.index)
         building_grid.append(x)
         streets.append(street)
-        street['count'] = 0.0
-        samplePoints = pbf.polygon_centroid_to_point(street)
-        rays = pbf.build_lines_from_point(samplePoints, maxes[i][0]/3, 30)
-        try:
-            raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
-        except:
-            print("An exception has occured: there were not enough bins which contained buildings")
-            continue
-        rays = rays.drop(raysWithBuildings.index.values.tolist())
-        tree_list = list(rays['geometry']) + list(street['geometry'])
-        strtree = STRtree(tree_list)
-        pbf.accumulate_counts(strtree, street, 5)
+        street['count'] = 1.0
         for j in street.index:
             grids[i].at[j, 'count'] = street.at[j, 'count']
-        with open('../datasets_and_generators/ANN_rawtraindata.txt', 'a') as outfile:
-            json.dump(list(grids[i]['count']), outfile)
+        # with open('../datasets_and_generators/ANN_rawtraindata.txt', 'a') as outfile:
+        #     json.dump(list(grids[i]['count']), outfile)
         # ax = x.plot()
         # scheme = mc.Quantiles(street['count'], k=15)
         # gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme,
@@ -233,26 +222,9 @@ def main():
         # plt.savefig('ANN_trainimages/x_'+str(i)+'.png')
         # plt.close()
 
-#saves dataset to json file
-    # os.remove("ANN_trainingdata.json")
-    masterlist = []
-    input_list = copy.deepcopy(grids)
-    output_list = copy.deepcopy(grids)
-    for i in range(len(grids)):
-        temp = ()
-        for j in input_list[i].index:
-            if grids[i].at[j, 'count'] != 0:
-                input_list[i].at[j, 'count'] = 0  # street
-            else:
-                output_list[i].at[j, 'count'] = -1  # wall
-                input_list[i].at[j, 'count'] = -1  # wall
-        temp = (list(input_list[i]['count']), list(output_list[i]['count']))
-        masterlist.append(temp)
-    with open('../datasets_and_generators/ANN_trainingdata_2.json', 'a') as outfile:
-        json.dump(masterlist, outfile)
 
 #save black and white street images and their labels for CNN
-    # os.remove("CNN_trainingimages.json")
+    os.remove("../datasets_and_generators/CNN_trainingimages_2.json")
     with open('../datasets_and_generators/CNN_trainingimages_2.json', 'a') as outfile:
         json.dump(grabCNNdata(grids, xpix), outfile)
     # os.remove("CNN_traininglabels.json")

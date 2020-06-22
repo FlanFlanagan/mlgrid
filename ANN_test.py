@@ -8,52 +8,52 @@ import random
 import json
 import numpy as np
 
-# def read_data_set():
-#     # training data------------------------------
-#     with open('datasets_and_generators/ANN_trainingdata.json', 'r') as openfile:
-#         mastertrainlist = json.load(openfile)
-#     #put in list of tuples
-#     mastertrainlist_tup = []
-#     for i in range(len(mastertrainlist)):
-#         temp = (np.array(mastertrainlist[i][0]), np.array(mastertrainlist[i][1]))
-#         mastertrainlist_tup.append(temp)
-#     # testing data-------------------------------
-#     with open('datasets_and_generators/ANN_testdata.json', 'r') as openfile:
-#         mastertestlist = json.load(openfile)
-#     #put in list of tuples
-#     mastertestlist_tup = []
-#     for i in range(len(mastertestlist)):
-#         temp = (np.array(mastertestlist[i][0]), np.array(mastertestlist[i][1]))
-#         mastertestlist_tup.append(temp)
-#     train_n = int(n * 0.8)  #determine percentage of the data used in the training set here
-#     # training_data = mastertrainlist_tup
-#     # print(len(training_data))
-#     test_data = mastertestlist_tup
-#     # print(len(test_data))
-#     return training_data, test_data
+def read_data_set():
+    # training data------------------------------
+    with open('datasets_and_generators/ANN_trainingdata.json', 'r') as openfile:
+        mastertrainlist = json.load(openfile)
+    #put in list of tuples
+    mastertrainlist_tup = []
+    for i in range(len(mastertrainlist)):
+        temp = (np.array(mastertrainlist[i][0]), np.array(mastertrainlist[i][1]))
+        mastertrainlist_tup.append(temp)
+    # testing data-------------------------------
+    with open('datasets_and_generators/ANN_testdata.json', 'r') as openfile:
+        mastertestlist = json.load(openfile)
+    #put in list of tuples
+    mastertestlist_tup = []
+    for i in range(len(mastertestlist)):
+        temp = (np.array(mastertestlist[i][0]), np.array(mastertestlist[i][1]))
+        mastertestlist_tup.append(temp)
+    # train_n = int(n * 0.8)  #determine percentage of the data used in the training set here
+    training_data = mastertrainlist_tup
+    # print(len(training_data))
+    test_data = mastertestlist_tup
+    # print(len(test_data))
+    return training_data, test_data
 
 # import random
 # import json
 # import numpy as np
 #
-def read_data_set():
-    with open('datasets_and_generators/ANN_trainingdata.json', 'r') as openfile:
-        masterlist = json.load(openfile)
-    #put in list of tuples
-    masterlist_tup = []
-    for i in range(len(masterlist)):
-        temp = (np.array(masterlist[i][0]), np.array(masterlist[i][1]))
-        # temp = tuple(masterlist[i])
-        masterlist_tup.append(temp)
-    n = len(masterlist_tup)
-    # print(n)
-    train_n = int(n * 0.8)  #determine percentage of the data used in the training set here
-    # print(train_n)
-    training_data = masterlist_tup[:(train_n)]
-    # print(len(training_data))
-    test_data = masterlist_tup[train_n:]
-    # print(training_data, "\n", test_data)
-    return training_data, test_data
+# def read_data_set():
+#     with open('datasets_and_generators/ANN_trainingdata.json', 'r') as openfile:
+#         masterlist = json.load(openfile)
+#     #put in list of tuples
+#     masterlist_tup = []
+#     for i in range(len(masterlist)):
+#         temp = (np.array(masterlist[i][0]), np.array(masterlist[i][1]))
+#         # temp = tuple(masterlist[i])
+#         masterlist_tup.append(temp)
+#     n = len(masterlist_tup)
+#     # print(n)
+#     train_n = int(n * 0.8)  #determine percentage of the data used in the training set here
+#     # print(train_n)
+#     training_data = masterlist_tup[:(train_n)]
+#     # print(len(training_data))
+#     test_data = masterlist_tup[train_n:]
+#     # print(training_data, "\n", test_data)
+#     return training_data, test_data
 
 def load_data_wrapper(inp, out):
     """Return a tuple containing ``(training_data, validation_data,
