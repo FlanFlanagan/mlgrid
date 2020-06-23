@@ -6,6 +6,7 @@ import cv2
 import os
 from sklearn.ensemble import RandomForestClassifier
 from keras.regularizers import l2
+from keras.constraints import maxnorm
 
 np.random.seed(0)
 tf.random.set_seed(0)
@@ -52,11 +53,11 @@ class CNN(object):
         # turn b&w
         (thresh, bawimg) = cv2.threshold(resized, 127, 255, cv2.THRESH_BINARY)
 
-        # show image
-        # cv2.imshow('b&w', bawimg)
-        # print("press enter\n")
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
+        #show image
+        cv2.imshow('b&w', bawimg)
+        print("press enter\n")
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         # turn data into proper format
         piclist = bawimg.tolist()
@@ -116,7 +117,7 @@ class CNN(object):
         labels_test = tf.cast(labels_test, tf.float32)
         dataset_test = tf.data.Dataset.from_tensor_slices((images_test, labels_test))
 
-        batch_size = 50
+        batch_size = 100
 
         dataset_train = dataset_train.cache()
         dataset_train = dataset_train.shuffle(n_train)
@@ -129,19 +130,24 @@ class CNN(object):
         dataset_test = dataset_test.prefetch(tf.data.experimental.AUTOTUNE)
 
         ## This is the baseline model. Only modify it after copying it to cells further below.
-        num_kernels = 3 #originally 3
+        num_kernels = 5 #originally 3
         dense_layer_neurons = 64 #originally 64
         kernels_size = (3,3) #originally 3,3
         model = tf.keras.models.Sequential([
+
+            tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu', kernel_constraint=maxnorm(5)),
+            tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu'),
             tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu'),
             tf.keras.layers.MaxPool2D(pool_size=(2, 2), padding='same'),
 
+            tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu', kernel_constraint=maxnorm(5)),
             tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu'),
+            # tf.keras.layers.Dropout(0.4),
             tf.keras.layers.MaxPool2D(pool_size=(2, 2), padding='same'),
 
             tf.keras.layers.Flatten(),
 
-            tf.keras.layers.Dense(dense_layer_neurons, activation='relu', kernel_regularizer=l2(0.0001), bias_regularizer=l2(0.0005)), #
+            tf.keras.layers.Dense(dense_layer_neurons, activation='relu', kernel_regularizer=l2(0.08), bias_regularizer=l2(0.08)), #
             tf.keras.layers.Dense(13)
             #TODO: look into this-> machinelearningmastery.com/how-to-configure-image-data-augmentation-when-training-deep-learning-neural-networks/
         ])
@@ -154,7 +160,7 @@ class CNN(object):
         )
 
         # Do not change any arguments in the call to model.fit()
-        epochs = 30 #originally 30
+        epochs = 20 #originally 30
         t = time.time()
         history = model.fit(dataset_train,
                             epochs=epochs,

@@ -174,7 +174,7 @@ def grabCNNdata(grids, nxpixels):
 def main():
     polys = []
     maxes = []
-    range_size = 5000  #global range variable
+    range_size = 500  #global range variable
     slist = []
     for i in range(range_size):
         x1 = np.random.uniform(10., 20)
@@ -191,8 +191,8 @@ def main():
         grid = []
         x_max = maxes[i][0]
         y_max = maxes[i][1]
-        xpix = 29 #this is equal to number of lines - 1 (xpix = ypix for now)
-        ypix = 29
+        xpix = 60 #this is equal to number of lines - 1 (xpix = ypix for now)
+        ypix = 60
         xs = np.linspace(0, x_max, xpix + 1)
         ys = np.linspace(0, y_max, ypix + 1)
         for x in range(len(xs) - 1):
@@ -213,14 +213,6 @@ def main():
         street['count'] = 1.0
         for j in street.index:
             grids[i].at[j, 'count'] = street.at[j, 'count']
-        # with open('../datasets_and_generators/ANN_rawtraindata.txt', 'a') as outfile:
-        #     json.dump(list(grids[i]['count']), outfile)
-        # ax = x.plot()
-        # scheme = mc.Quantiles(street['count'], k=15)
-        # gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme,
-        #                 legend_kwargs={'bbox_to_anchor': (1, 0.9)})
-        # plt.savefig('ANN_trainimages/x_'+str(i)+'.png')
-        # plt.close()
 
 
 #save black and white street images and their labels for CNN
@@ -231,10 +223,10 @@ def main():
     with open('../datasets_and_generators/CNN_traininglabels.json', 'a') as outfile:
         json.dump(slist, outfile)
 
-#append new data to master data lists
-    imagefilelist = ['../datasets_and_generators/CNN_MASTERtrainingimages.json',
+#append new data to master data lists--------------------------------------------------------------------- comment out when wanting to exclude data from master data set
+    imagefilelist = ['../datasets_and_generators/CNN_MASTER2trainingimages.json',
                      '../datasets_and_generators/CNN_trainingimages.json']
-    labelfilelist = ['../datasets_and_generators/CNN_MASTERtraininglabels.json',
+    labelfilelist = ['../datasets_and_generators/CNN_MASTER2traininglabels.json',
                      '../datasets_and_generators/CNN_traininglabels.json']
 
     masterimagelist = []
@@ -242,7 +234,7 @@ def main():
         with open(i, 'r') as openfile:
             mylist = json.load(openfile)
             masterimagelist.extend(mylist)
-    os.remove("../datasets_and_generators/CNN_MASTERtrainingimages.json")
+    os.remove("../datasets_and_generators/CNN_MASTER2trainingimages.json")
     with open('../datasets_and_generators/CNN_MASTERtrainingimages.json', 'a') as outfile:
         json.dump(masterimagelist, outfile)
 
@@ -251,7 +243,7 @@ def main():
         with open(i, 'r') as openfile:
             mylist = json.load(openfile)
             masterlabellist.extend(mylist)
-    os.remove("../datasets_and_generators/CNN_MASTERtraininglabels.json")
+    os.remove("../datasets_and_generators/CNN_MASTER2traininglabels.json")
     with open('../datasets_and_generators/CNN_MASTERtraininglabels.json', 'a') as outfile:
         json.dump(masterlabellist, outfile)
 
