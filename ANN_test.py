@@ -10,9 +10,10 @@ import numpy as np
 
 def read_data_set():
     # training data------------------------------
-    with open('datasets_and_generators/ANN_trainingdata.json', 'r') as openfile:
+    with open('datasets_and_generators/ANN_trainingdata_MASTER.json', 'r') as openfile:
         mastertrainlist = json.load(openfile)
     #put in list of tuples
+    # print(len(mastertrainlist))
     mastertrainlist_tup = []
     for i in range(len(mastertrainlist)):
         temp = (np.array(mastertrainlist[i][0]), np.array(mastertrainlist[i][1]))
@@ -25,35 +26,9 @@ def read_data_set():
     for i in range(len(mastertestlist)):
         temp = (np.array(mastertestlist[i][0]), np.array(mastertestlist[i][1]))
         mastertestlist_tup.append(temp)
-    # train_n = int(n * 0.8)  #determine percentage of the data used in the training set here
     training_data = mastertrainlist_tup
-    # print(len(training_data))
     test_data = mastertestlist_tup
-    # print(len(test_data))
     return training_data, test_data
-
-# import random
-# import json
-# import numpy as np
-#
-# def read_data_set():
-#     with open('datasets_and_generators/ANN_trainingdata.json', 'r') as openfile:
-#         masterlist = json.load(openfile)
-#     #put in list of tuples
-#     masterlist_tup = []
-#     for i in range(len(masterlist)):
-#         temp = (np.array(masterlist[i][0]), np.array(masterlist[i][1]))
-#         # temp = tuple(masterlist[i])
-#         masterlist_tup.append(temp)
-#     n = len(masterlist_tup)
-#     # print(n)
-#     train_n = int(n * 0.8)  #determine percentage of the data used in the training set here
-#     # print(train_n)
-#     training_data = masterlist_tup[:(train_n)]
-#     # print(len(training_data))
-#     test_data = masterlist_tup[train_n:]
-#     # print(training_data, "\n", test_data)
-#     return training_data, test_data
 
 def load_data_wrapper(inp, out):
     """Return a tuple containing ``(training_data, validation_data,
@@ -99,8 +74,8 @@ def vectorized_result(j, out):
 
 import ANN_network
 
-training_data, test_data = load_data_wrapper(841, 841)
+training_data, test_data = load_data_wrapper(1521, 1521)
 test_data = list(test_data)
 # training_data, test_data = read_data_set()
-net = ANN_network.Network([841, 100, 100, 841])
+net = ANN_network.Network([1521, 100, 100, 1521])
 net.SGD(training_data, 30, 5, -0.4, test_data=test_data)
