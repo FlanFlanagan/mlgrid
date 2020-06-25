@@ -136,13 +136,13 @@ class CNN(object):
         model = tf.keras.models.Sequential([
 
             tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu'),  # , kernel_constraint=maxnorm(5)
-            tf.keras.layers.MaxPool2D(pool_size=(2, 2), padding='same'),
+            tf.keras.layers.MaxPool2D(pool_size=(2, 2), padding='valid'),
 
             tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu'),  # , kernel_constraint=maxnorm(5)
             tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu'),
             tf.keras.layers.Conv2D(num_kernels, kernels_size, activation='relu'),
             tf.keras.layers.Dropout(0.3),
-            tf.keras.layers.MaxPool2D(pool_size=(2, 2), padding='same'),
+            tf.keras.layers.MaxPool2D(pool_size=(2, 2), padding='valid'),
 
             tf.keras.layers.Flatten(),
 
@@ -160,7 +160,7 @@ class CNN(object):
         )
 
         # Do not change any arguments in the call to model.fit()
-        epochs = 20  # originally 30
+        epochs = 60  # originally 30
         t = time.time()
         history = model.fit(dataset_train,
                             epochs=epochs,
