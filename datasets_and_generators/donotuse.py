@@ -1,17 +1,16 @@
-import pandas as pd
-import geopandas as gp
-import numpy as np
-import geoplot as gplt
-import random
-import matplotlib.pyplot as plt
-from shapely.geometry import Polygon
-from shapely.geometry.point import Point
-# import parry.binning_functions as pbf
-# from shapely.strtree import STRtree
-import mapclassify as mc
 import json
-import copy
 import os
+
+'''
+this code holds the purpose of fixing datasets if something ever
+gets appended wrong and it wouldn't make sense to remake an
+entire dataset. This should ONLY be done if you know exactly what is 
+wrong and what specifically needs to be removed from the file 
+to fix it.
+
+It places the files contents into a list, removes items based on
+chosen indices, and replaces file contents with new list.
+'''
 
 
 masterlist = []

@@ -9,11 +9,22 @@ import json
 import numpy as np
 
 def read_data_set():
+    """
+    Reads in data from MASTER json files and outputs data in lists labeled
+    training_data, test_data
+    Parameters
+    ----------
+    none
+
+    Returns
+    -------
+    training_data, test_data: Lists
+        lists containing the data used to train and test ANN
+    """
     # training data------------------------------
     with open('datasets_and_generators/ANN_trainingdata_MASTER.json', 'r') as openfile:
         mastertrainlist = json.load(openfile)
     #put in list of tuples
-    # print(len(mastertrainlist))
     mastertrainlist_tup = []
     for i in range(len(mastertrainlist)):
         temp = (np.array(mastertrainlist[i][0]), np.array(mastertrainlist[i][1]))

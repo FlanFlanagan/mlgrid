@@ -15,6 +15,24 @@ import copy
 import os
 import numpy as np
 
+"""
+All poly functions below get sequentially called by 
+master_poly and return a list of points used to clip the Manhattan 
+geodataframe to create test set based on real images.
+It also returns the function name to name the files where 
+the images get saved particularly for the CNN.
+Parameters
+----------
+none
+
+Returns
+-------
+[x_min, y_min, x_max, y_max, name]: list of 4 floats and a str
+    the four points mark where on the manhattan shp file the shapes
+    get clipped from and the name will be the name of the file where 
+    the images get saved for the CNN test images
+"""
+
 
 def poly1_1():
     x_min = -73.98527333395992
@@ -127,10 +145,42 @@ def poly12_2():
 # add new poly definitions here
 
 def clipmaker(x_min, y_min, x_max, y_max):
+    """
+    takes in the x_min, y_min, x_max, y_max of a desired
+    dataframe clipping and returns a polygon defined by these
+    points
+    Parameters
+    ----------
+    x_min, y_min, x_max, y_max: floats
+        the points in the Manhattan shp file
+
+    Returns
+    -------
+    Polygon(points): Polygon
+        a polygon defined by the specified points on the Manhattan
+        shp file which will be used to clip out target shapes
+    """
     return Polygon([(x_min, y_min), (x_min, y_max), (x_max, y_max), (x_max, y_min), (x_min, y_min)])
 
 
 def clippoly(master, clipper):
+    """
+    returns the clipped geodataframe by clipping the master geodataframe
+    containing all of the polygons in Manhattan with the clipper polygon
+    defined by the points where we want manhattan to get clipped.
+    Parameters
+    ----------
+    master: geodataframe
+        the points in the Manhattan shp file
+    clipper: polygon
+        polygon defined by the points used to clip the
+        master geodataframe
+
+    Returns
+    -------
+    gp.GeoDataFrame(geometry=poly): geodataframe
+        the clipped geodataframe
+    """
     # clip NewYork to the different polygons
     NY_clipped = gp.clip(master, clipper)
     poly = []
@@ -140,6 +190,18 @@ def clippoly(master, clipper):
 
 
 def save_image(data, fn):
+    """
+    Saves CNN training images in the proper format. This
+    involves primarily removing the white border from the
+    figure containing the data before saving it as fn
+    Some code obtained at: https://stackoverflow.com/questions/11837979/removing-white-space-around-a-saved-image-in-matplotlib
+    Parameters
+    ----------
+    data: polygon/geodataframe (clipped geodataframe)
+        clipped polys of Manhattan to be saved as CNN test pngs.
+    fn: str
+        file path/name
+    """
     data.plot(color="black", edgecolor='black')
     plt.gca().set_axis_off()
     plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
@@ -152,10 +214,31 @@ def save_image(data, fn):
 
 
 def master_poly():
+    """
+    the master_poly function does all the data preparation to turn the
+    raw Manhattan shp file into preselected geodataframes defined by
+    each gen_poly function. It loads in the shp file using geopandas and
+    then after creating a list of all the desired clips using the information
+    in the gen_poly funcs and making them into polygons with clipmaker()
+    it then clips the NewYork dataframe by calling clippoly(). It saves
+    the new geodataframes as pngs by calling save_image() for the CNN testing
+    image dataand returns the polys list of geodataframes as well as their
+    defining points to main
+    Parameters
+    ----------
+    none
+
+    Returns
+    -------
+    polys: list of geodataframes
+        list of the clipped geodataframes
+    points: list of lists of floats
+        list of lists of the clipping points-> (x_min, y_min, x_max, y_max)
+    """
     # place Manhattan shape file intp gp dataframe
     NewYork = gp.read_file('../Manhattan files/ManhattanBuildings.shp')
 
-    # points is the list that with store all the poly clip points
+    # points is the list that will store all the poly clip points
     points = []
     points.append(poly1_1())
     points.append(poly2_1())
@@ -171,17 +254,32 @@ def master_poly():
     points.append(poly12_2())
     # add polys to points list here......................
     polys = []
+    # placing clipped polys into a list with a for loop
     for i in points:
         polys.append(clippoly(NewYork, clipmaker(i[0], i[1], i[2], i[3])))
+    # saving images of the polys using save_image() and storing with name of poly generated
     for j in range(len(polys)):
-        save_image(polys[j], '../CNN_testimages/'+str(points[j][4])+'')
+        save_image(polys[j], '../datasets_and_generators/CNN_testimages/' + str(points[j][4]) + '')
     return polys, points
 
 
 def main():
+
     polys, ranges = master_poly()
     range_size = len(polys)
 
+    '''
+    part 1: this section of the code holds the purpose
+    of building the grid over the polygons just clipped 
+    previously using master_poly() which come from the 
+    original Manhattan shp file. It then takes the 
+    polygon in a list [grid] which then gets
+    appended to grids as a geopandas dataframe. 
+
+    note: ensure that the pixel #s are equivalent to 
+    those defined in ANN_training_data_generator.py
+    as well as CNN_training_data_generator.py
+    '''
     grids = []
     for i in range(range_size):
         grid = []
@@ -195,6 +293,24 @@ def main():
                 grid.append(poly)
         grids.append(gp.GeoDataFrame(geometry=grid))
 
+    '''
+    part 2: this portion of the code is what determines the data
+    going into the ANN data set. It calculates the visibility 
+    for each point in the street defined by the grids and number 
+    of pixels in them. Each pixel is like a point. It then places 
+    the calculated street visibility values into grids in the 
+    correct format to be reformatted later and stored 
+    in a json file in part 3. This part also saves pngs of the 
+    plots of data to visualize the outcomes.
+
+    NOTE: for the lines marked with '**************' the values for 
+    ray_length and ray_number need to be tweaked whenever the number of 
+    pixels gets changed in order to obtain a reasonable run time along
+    with accurate results based on the plotted outcomes. This will 
+    require a bit of trial and error. 
+    (it was found that for 39x39 pixels: ray_length = ranges[i][2] * 1.2 & ray_number = 16 yielded good results)
+    (it was found that for 29x29 pixels: ray_length = ranges[i][2]/3 & ray_number = 30 yielded good results)
+    '''
     streets = []
     building_grid = []
     for i in range(len(grids)):
@@ -207,7 +323,9 @@ def main():
         street['count'] = 0.0
         samplePoints = pbf.polygon_centroid_to_point(street)
         ray_length = (ranges[i][2] - ranges[i][0]) * 1.2
-        rays = pbf.build_lines_from_point(samplePoints, ray_length, 16)
+        ray_length = ranges[i][2] * 1.2  # **************
+        ray_number = int(16)  # **************
+        rays = pbf.build_lines_from_point(samplePoints, ray_length, ray_number)  # **************
         raysWithBuildings = gp.sjoin(rays, polys[i], op="intersects")
         rays = rays.drop(raysWithBuildings.index.values.tolist())
         tree_list = list(rays['geometry']) + list(street['geometry'])
@@ -215,16 +333,18 @@ def main():
         pbf.accumulate_counts(strtree, street, 5)
         for j in street.index:
             grids[i].at[j, 'count'] = street.at[j, 'count']
-        # with open('ANN_rawtestdata.txt', 'a') as outfile:
-        #     json.dump(list(grids[i]['count']), outfile)
         ax = x.plot()
         scheme = mc.Quantiles(street['count'], k=15)
         gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme,
                         legend_kwargs={'bbox_to_anchor': (1, 0.9)})
-        plt.savefig('../ANN_testimages/x_' + str(i) + '.png')
+        plt.savefig('../datasets_and_generators/ANN_testimages/x_' + str(i) + '.png')
 
         plt.close()
 
+    '''
+    part 3: Puts data in correct format for ANN and places
+    it into a list to then be stored in file.
+    '''
     # saves dataset to json file
     os.remove("ANN_testdata.json")
     masterlist = []

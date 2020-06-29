@@ -22,6 +22,12 @@ Parameters
 ----------
 x1, x2, x3, y1, y2, y3: Float
     define side lengths of randomly generated poly.
+
+Returns
+-------
+gp.GeoDataFrame(geometry=polys): GeoDataFrame
+    A GeoDataFrame containing the polygon shapes defined
+    in each poly function
 """
 
 
@@ -219,15 +225,21 @@ def gen_poly12(x1, x2, x3, y1, y2, y3):
 
 def master_poly(x1, x2, x3, y1, y2, y3, s):
     """
-        Calls randomly generated poly function based on s and
-        receives and returns geodataframe of that poly.
-        Parameters
-        ----------
-        x1, x2, x3, y1, y2, y3: Float
-            define side lengths of randomly generated poly.
-        s: Int
-            indicates which poly is to be generated.
-        """
+    Calls randomly generated poly function based on s and
+    receives and returns geodataframe of that poly.
+    Parameters
+    ----------
+    x1, x2, x3, y1, y2, y3: Float
+        define side lengths of randomly generated poly.
+    s: Int
+        indicates which poly is to be generated.
+
+    Returns
+    -------
+    poly: GeoDataFrame
+        A GeoDataFrame containing the polygon shapes defined
+        in whichever poly function was called
+    """
     if s == 1: poly = gen_poly1(x1, x2, x3, y1, y2, y3)
     if s == 2: poly = gen_poly2(x1, x2, x3, y1, y2, y3)
     if s == 3: poly = gen_poly3(x1, x2, x3, y1, y2, y3)
@@ -246,8 +258,8 @@ def master_poly(x1, x2, x3, y1, y2, y3, s):
 def chunks(lst, n):
     """
     Yields successive n-sized chunks from lst.
-    Parameters
     Obtained at: https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
+    Parameters
     ----------
     lst: List
         lst to be broken into chunks.
@@ -266,6 +278,11 @@ def grabANNdata(grid):
     ----------
     grids: GeoDataFrame
         geodataframe containing data on the polys to be stored in a list.
+
+    Returns
+    -------
+    master: List of tuples
+        A list of tuples with all ANN training data to be stored
     """
     input_list = copy.deepcopy(grid)
     output_list = copy.deepcopy(grid)
@@ -276,7 +293,6 @@ def grabANNdata(grid):
             output_list.at[j, 'count'] = -1  # wall
             input_list.at[j, 'count'] = -1  # wall
     master = (list(input_list['count']), list(output_list['count']))
-    # master = temptup
     return master
 
 
@@ -306,7 +322,7 @@ def append_to_json(_dict, path):
 
 
 # main---------------------------------------------
-range_size = 5  # USER DEFINED: number of data points to add to CNN data set
+range_size = 1000  # USER DEFINED: number of data points to add to CNN data set
 
 for i in range(range_size):
 
@@ -347,6 +363,7 @@ for i in range(range_size):
 
     note: ensure that the pixel #s are equivalent to 
     those defined in ANN_CNN_test_data_generator.py
+    as well as CNN_training_data_generator.py
     '''
     x_max = maxes[0]
     y_max = maxes[1]
@@ -405,7 +422,7 @@ for i in range(range_size):
         scheme = mc.Quantiles(street['count'], k=20)
         gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme, cmap="jet",
                         legend_kwargs={'bbox_to_anchor': (1, 0.9)})
-        plt.savefig('../ANN_trainimages/x_' + str(i) + '.png')
+        plt.savefig('../datasets_and_generators/ANN_trainimages/x_' + str(i) + '.png')
         plt.close()
 
     '''

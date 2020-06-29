@@ -15,6 +15,15 @@ import json
 import copy
 import os
 
+'''
+this is the original training data generator which since its last 
+use was split into two generators, one which could create
+data for the CNN and the other focused on the ANN. It is
+left here for reference in case something translates poorly
+in the new code and the original code may be used to help 
+fix it.
+'''
+
 #shape definitions
 
 def gen_poly1(x1, x2, x3, y1, y2, y3):  #typical intersection with rectangles

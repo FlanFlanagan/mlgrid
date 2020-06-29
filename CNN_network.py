@@ -2,12 +2,13 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist
 import time
-import cv2
-import os
-from sklearn.ensemble import RandomForestClassifier
 from keras.regularizers import l2
 from keras.constraints import maxnorm
-
+"""
+This is a rewrite and extention of the example CNN used initially for demonstration
+ in the class Intro to Data Science taught in the spring semester
+of 2020 at Colorado School of Mines by Dr. Wendy Fisher
+"""
 np.random.seed(0)
 tf.random.set_seed(0)
 
@@ -40,45 +41,7 @@ class CNN(object):
         plt.grid(True)
         plt.show()
 
-    def chunks(self, lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
-
-    def prepare(self, filepath, num_pix):
-        img = cv2.imread(filepath)
-        grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # resize image
-        resized = cv2.resize(grayImage, (num_pix, num_pix), interpolation=cv2.INTER_AREA)
-        # turn b&w
-        (thresh, bawimg) = cv2.threshold(resized, 127, 255, cv2.THRESH_BINARY)
-
-        # show image
-        # cv2.imshow('b&w', bawimg)
-        # print("press enter\n")
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
-
-        # turn data into proper format
-        piclist = bawimg.tolist()
-        flat_list = [item for sublist in piclist for item in sublist]
-        masterlist = []
-        mainlist = []
-        for j in flat_list:
-            if j == 0:
-                mainlist.append(0.)
-            else:
-                mainlist.append(1.)
-        tempa = self.chunks(mainlist, num_pix)
-        masterlist.append(list(tempa))
-        matrix = np.asarray(list(masterlist))
-        # matrix = matrix / 255
-        matrix = np.expand_dims(matrix, axis=3)  # TensorFlow expects a channel dimension
-        matrix = tf.cast(matrix, tf.float32)
-        return matrix
-
     def loaddata_and_run(self, images_tr, labels_tr, images_te, labels_te):
-
         verbose = 1  # 0==no output, 1=accuracy/loss output, 2=progress bar output
 
         # Load data - #TODO eventually this should call a database of our own
@@ -90,11 +53,13 @@ class CNN(object):
         # to accelerate training, and demonstrate possible pitfalls of smaller training data sets.
 
         n_train = len(images_train)
+        # n_train = 1000  # use a subset and change size here if desired
         images_train = images_train[0:n_train]
         labels_train = labels_train[0:n_train]
         num_pix = len(images_train[0][0])  # assuming a square
 
         n_test = len(images_test)
+        # n_train = 1000  # use a subset and change size here if desired
         images_test = images_test[0:n_test]
         labels_test = labels_test[0:n_test]
 
@@ -117,7 +82,7 @@ class CNN(object):
         labels_test = tf.cast(labels_test, tf.float32)
         dataset_test = tf.data.Dataset.from_tensor_slices((images_test, labels_test))
 
-        batch_size = 50
+        batch_size = 1000
 
         dataset_train = dataset_train.cache()
         dataset_train = dataset_train.shuffle(n_train)
@@ -148,19 +113,22 @@ class CNN(object):
 
             tf.keras.layers.Dense(dense_layer_neurons, activation='relu', kernel_regularizer=l2(0.1),
                                   bias_regularizer=l2(0.08)),  #
-            tf.keras.layers.Dense(13)
-            # TODO: look into this-> machinelearningmastery.com/how-to-configure-image-data-augmentation-when-training-deep-learning-neural-networks/
+            tf.keras.layers.Dense(13, activation='softmax')
+            # TODO: look into this->
+            #  https://www.quora.com/What-are-some-useful-tips-for-choosing-and-tweaking-a-convolutional-neural-network-architecture-and-hyperparameters
+            #  https://machinelearningmastery.com/how-to-configure-image-data-augmentation-when-training-deep-learning-neural-networks/
+
         ])
 
         # Do not change any arguments in the call to model.compile()
         model.compile(
             loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-            optimizer=tf.keras.optimizers.Adam(0.001),
+            optimizer=tf.keras.optimizers.Adam(0.001), #TODO: determine appropriate optimizer -> https://keras.io/api/optimizers/
             metrics=['accuracy'],
         )
 
         # Do not change any arguments in the call to model.fit()
-        epochs = 60  # originally 30
+        epochs = 30  # originally 30
         t = time.time()
         history = model.fit(dataset_train,
                             epochs=epochs,
@@ -179,22 +147,3 @@ class CNN(object):
         model = tf.keras.models.load_model("CNN_model.model")
 
         return model, num_pix
-
-    def testCNN(self, model, num_pix):
-
-        directory = os.fsencode('CNN_testimages')
-        test_imgs = []
-        filename = []
-        for file in os.listdir(directory):
-            filename.append(os.fsdecode(file))
-        for i in filename:
-            test_imgs.append(self.prepare('CNN_testimages/' + str(i) + '', num_pix))  # 'CNN_testimages/poly6_1.jpg'
-
-        # report outcomes
-        prediction = []
-        for j in test_imgs:
-            # print(j)
-            prediction.append(model.predict_classes(j))
-            # print(prediction)
-        for k in range(len(prediction)):
-            print('image ' + str(filename[k]) + '', 'contains poly: ' + str(prediction[k]) + '\n')

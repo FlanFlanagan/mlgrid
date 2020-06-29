@@ -21,6 +21,12 @@ Parameters
 ----------
 x1, x2, x3, y1, y2, y3: Float
     define side lengths of randomly generated poly.
+
+Returns
+-------
+gp.GeoDataFrame(geometry=polys): GeoDataFrame
+    A GeoDataFrame containing the polygon shapes defined
+    in each poly function
 """
 
 
@@ -226,6 +232,12 @@ def master_poly(x1, x2, x3, y1, y2, y3, s):
         define side lengths of randomly generated poly.
     s: Int
         indicates which poly is to be generated.
+
+    Returns
+    -------
+    poly: GeoDataFrame
+        A GeoDataFrame containing the polygon shapes defined
+        in whichever poly function was called
     """
     if s == 1: poly = gen_poly1(x1, x2, x3, y1, y2, y3)
     if s == 2: poly = gen_poly2(x1, x2, x3, y1, y2, y3)
@@ -245,8 +257,8 @@ def master_poly(x1, x2, x3, y1, y2, y3, s):
 def chunks(lst, n):
     """
     Yields successive n-sized chunks from lst.
-    Parameters
     Obtained at: https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
+    Parameters
     ----------
     lst: List
         lst to be broken into chunks.
@@ -267,6 +279,11 @@ def grabCNNdata(grid, nxpixels):
         geodataframe containing data on the polys to be stored in a list.
     nxpixels: Int
         number of pixels (values per row in each matrix).
+
+    Returns
+    -------
+    masterlist: List
+        A List of lists containing the data on the polygons to be stored
     """
     input_list = copy.deepcopy(grid)
     temp = []
@@ -307,7 +324,7 @@ def append_to_json(_dict, path):
 
 
 # main---------------------------------------------
-range_size = 5  # USER DEFINED: number of data points to add to CNN data set
+range_size = 20000  # USER DEFINED: number of data points to add to CNN data set
 
 for i in range(range_size):
 
@@ -344,7 +361,8 @@ for i in range(range_size):
     set equal to grid as a geopandas dataframe. 
 
     note: ensure that the pixel #s are equivalent to 
-    those defined in ANN_CNN_test_data_generator.py
+    those defined in ANN_training_data_generator.py
+    as well as ANN_CNN_test_data_generator.py
     '''
     x_max = maxes[0]
     y_max = maxes[1]
