@@ -3,6 +3,6 @@ __pycache__/
 # idea
 .idea/
 # .png s
-*.png
+#*.png
 #MASTER data sets
 *_MASTER.json
