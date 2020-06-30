@@ -42,7 +42,7 @@ def chunks(lst, n):
     Parameters
     ----------
     lst: List
-        lst to be broken into chunks.
+        lst to be broken into n sized chunks.
     n: Int
         size of chunks to break lst into.
     """
@@ -58,15 +58,15 @@ def prepare(filepath, num_pix):
     that can be interpreted by the CNN to make predictions with.
     Parameters
     ----------
-    filepath: str containing filepath
-        lst to be broken into chunks.
+    filepath: String
+        file path/file name
     num_pix: Int
-        number of pixels in an image row/column.
+        number of columns/rows in an image.
 
     Returns
     -------
-    matrix: Array type Obj
-        lists containing the data used to train and test CNN
+    matrix: Array-Like Obj
+        lists containing the data used to train and test CNN model
     """
     img = cv2.imread(filepath)  # reads in image
     grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # turns image to gray scale
@@ -102,14 +102,15 @@ def testCNN(model, num_pix):
     """
     This is the function used to show how well the model can
     make predictions using real images. It takes in each image
-    from  the folder called CNN_test images which were created using
-    ANN_CNN_test_data_generator. It loops through each image, preparing
-    it using the prepare() function, predicting the poly type with
-    the model, and printing out the file names with their relative
-    predictions.
+    from  the folder called CNN_testimages which were created using
+    ANN_CNN_test_data_generator.py. It loops through each image
+    in the folder, preparing them using the prepare() function,
+    predicting the poly type with the model, and printing out
+    the file names with their relative predictions.
     Parameters
     ----------
-    model: CNN-model.model
+    model: Trained CNN Model
+        CNN-model.model
     num_pix: Int
         number of pixels in an image(matrix) row/column.
     """

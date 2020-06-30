@@ -20,7 +20,7 @@ master_poly and return the geodataframe of the polys
 created by each poly definition.
 Parameters
 ----------
-x1, x2, x3, y1, y2, y3: Float
+x1, x2, x3, y1, y2, y3: Floats
     define side lengths of randomly generated poly.
 
 Returns
@@ -226,13 +226,14 @@ def gen_poly12(x1, x2, x3, y1, y2, y3):
 def master_poly(x1, x2, x3, y1, y2, y3, s):
     """
     Calls randomly generated poly function based on s and
-    receives and returns geodataframe of that poly.
+    returns the geodataframe of that poly.
     Parameters
     ----------
     x1, x2, x3, y1, y2, y3: Float
-        define side lengths of randomly generated poly.
+        defines side lengths of randomly generated polys.
     s: Int
-        indicates which poly is to be generated.
+        randomly generated to indicate which poly is to
+        be created.
 
     Returns
     -------
@@ -262,7 +263,7 @@ def chunks(lst, n):
     Parameters
     ----------
     lst: List
-        lst to be broken into chunks.
+        lst to be broken into n sized chunks.
     n: Int
         size of chunks to break lst into.
     """
@@ -273,16 +274,18 @@ def chunks(lst, n):
 def grabANNdata(grid):
     """
     Puts data in correct format for ANN and places
-    it into a list to be stored in file later.
+    it into a list to be stored in a json file later.
     Parameters
     ----------
-    grids: GeoDataFrame
-        geodataframe containing data on the polys to be stored in a list.
+    grid: GeoDataFrame
+        geodataframe containing data on the polys generated
+        in part 3 of main().
 
     Returns
     -------
-    master: List of tuples
+    master: List of Tuples
         A list of tuples with all ANN training data to be stored
+        in a json file.
     """
     input_list = copy.deepcopy(grid)
     output_list = copy.deepcopy(grid)
@@ -298,16 +301,16 @@ def grabANNdata(grid):
 
 def append_to_json(_dict, path):
     """
-    Manually appends data to MASTER data files without pulling
-    out data, into a list to get appended to, first thus avoiding
-    any memory leaks or major slow downs.
+    Manually appends data to MASTER data files, without pulling
+    out data in file into a list to get appended to first, thus avoiding
+    any memory leaks and major slow downs.
     Obtained at: https://stackoverflow.com/questions/12994442/how-to-append-data-to-a-json-file
     Parameters
     ----------
-    _dict: List/Array Like Object
+    _dict: List/Array-Like Object
         contains data to be stored in file
-    path: File Path
-        path to file that stores data
+    path: String
+        file path/file name
     """
     with open(path, 'ab+') as f:
         f.seek(0, 2)  # Go to the end of file
@@ -322,16 +325,26 @@ def append_to_json(_dict, path):
 
 
 # main---------------------------------------------
-range_size = 1000  # USER DEFINED: number of data points to add to CNN data set
+range_size = 5  # USER DEFINED: number of data points to be added to CNN data set
 
 for i in range(range_size):
+    '''
+    note about this entire section: python runs more efficiently 
+    when having everything stored in, appended to, and extracted from 
+    lists which is why, despite it making the code look less cleanly,
+    everything is done using lists
+    '''
 
     print(i)  # tells us which iteration we are on
 
     '''
-    list variables declared below along with where they are created
+    list variables declared below along with where 
+    they are initially appended to
     '''
-    grid = None  # part 2
+    polys = []  # part 1
+    maxes = []  # part 1
+    grids = []  # part 2
+    grid = []  # part 2
     building_grid = []  # part 3
     streets = []  # part 3
     raysWithBuildings = None  # part 3
@@ -341,50 +354,50 @@ for i in range(range_size):
     lengths that will be used to define each polygon 
     and randomly decides which polygon will be generated. 
     Then it calls master_poly() which will return the 
-    defined polygon and gets set equal to poly
-    and the max lengths get set equal to maxes.
+    defined polygon and gets appended to polys[]
+    and the max lengths get appended to maxes[].
     '''
     x1 = np.random.uniform(.02, .04)
     x2 = np.random.uniform(0., .01)
     y1 = np.random.uniform(.02, .04)
     y2 = np.random.uniform(0., .01)
     s = int(np.random.uniform(1, 13))  # random # between 1-12 (number of poly functions)
-    poly = master_poly(x1, x2, x1, y1, y2, y1, s)
-    maxes = (x1 + x2 + x1, y1 + y2 + y1)
+    polys.append(master_poly(x1, x2, x1, y1, y2, y1, s))
+    maxes.append((x1 + x2 + x1, y1 + y2 + y1))
 
     '''
     part 2: this section of the code holds the purpose
-    of building the grid over the polygon just created 
+    of building a grid over the geodataframe just created 
     previously and xpix and ypix are where the user 
-    defines how many pixels or matrix values should be 
-    used to describe each polygon. It then takes the 
-    polygon in a list [gridpoly] which then gets
-    set equal to grid as a geopandas dataframe. 
+    defines how many pixels or matrix columns should be 
+    used to describe each polygon. It then takes these 
+    grid polygons in a list grid[] which then gets
+    appended to grids[] as a geopandas dataframe. 
 
     note: ensure that the pixel #s are equivalent to 
     those defined in ANN_CNN_test_data_generator.py
     as well as CNN_training_data_generator.py
     '''
-    x_max = maxes[0]
-    y_max = maxes[1]
+
+    x_max = maxes[0][0]
+    y_max = maxes[0][1]
     xpix = 39  # this is equal to number of lines - 1 (xpix = ypix for now)
     ypix = 39
     xs = np.linspace(0, x_max, xpix + 1)
     ys = np.linspace(0, y_max, ypix + 1)
-    temp = []
     for x in range(len(xs) - 1):
         for y in range(len(ys) - 1):
-            gridpoly = Polygon(((xs[x], ys[y]), (xs[x], ys[y + 1]), (xs[x + 1], ys[y + 1]), (xs[x + 1], ys[y])))
-            temp.append(gridpoly)
-            grid = gp.GeoDataFrame(geometry=temp)
+            poly = Polygon(((xs[x], ys[y]), (xs[x], ys[y + 1]), (xs[x + 1], ys[y + 1]), (xs[x + 1], ys[y])))
+            grid.append(poly)
+    grids.append(gp.GeoDataFrame(geometry=grid))
 
     '''
     part 3: this portion of the code is what determines the data
     going into the ANN data set. It calculates the visibility 
     for each point in the street defined by the grid and number 
     of pixels in it. Each pixel is like a point. It then places 
-    the calculated street visibility values into grid in the 
-    correct format to be reformatted by grabANNdata() and stored 
+    the calculated street visibility values into grids[] in the 
+    correct format to be reformatted by grabANNdata() for storage 
     in a json file in part 4. This part also saves pngs of the 
     plots of data for the first 10 iterations to visualize the outcomes.
     
@@ -396,43 +409,45 @@ for i in range(range_size):
     (it was found that for 39x39 pixels: ray_length = x_max * 1.2 & ray_number = 16 yielded good results)
     (it was found that for 29x29 pixels: ray_length = x_max/3 & ray_number = 30 yielded good results)
     '''
-    x = gp.sjoin(grid, poly, op='intersects')
-    grid['count'] = 0.0
-    street = grid.drop(x.index)
-    building_grid.append(x)
-    streets.append(street)
-    street['count'] = 0.0
-    samplePoints = pbf.polygon_centroid_to_point(street)
-    ray_length = x_max * 1.2  # **************
-    ray_number = int(16)  # **************
-    rays = pbf.build_lines_from_point(samplePoints, ray_length, ray_number)  # **************
-    try:
-        raysWithBuildings = gp.sjoin(rays, poly, op="intersects")
-    except:
-        print("An exception has occured: there were not enough bins which contained buildings")
-        continue
-    rays = rays.drop(raysWithBuildings.index.values.tolist())
-    tree_list = list(rays['geometry']) + list(street['geometry'])
-    strtree = STRtree(tree_list)
-    pbf.accumulate_counts(strtree, street, 7)
-    for k in street.index:
-        grid.at[k, 'count'] = street.at[k, 'count']
-    if i < 10:  # saves images of the plots of data for first 10 iterations
-        ax = x.plot()
-        scheme = mc.Quantiles(street['count'], k=20)
-        gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme, cmap="jet",
-                        legend_kwargs={'bbox_to_anchor': (1, 0.9)})
-        plt.savefig('../datasets_and_generators/ANN_trainimages/x_' + str(i) + '.png')
-        plt.close()
+    for j in range(len(grids)):
+        x = gp.sjoin(grids[j], polys[j], op='intersects')
+        grids[j]['count'] = 0.0
+        street = grids[j].drop(x.index)
+        building_grid.append(x)
+        streets.append(street)
+        street['count'] = 0.0
+        samplePoints = pbf.polygon_centroid_to_point(street)
+        ray_length = x_max * 1.2  # **************
+        ray_number = int(16)  # **************
+        rays = pbf.build_lines_from_point(samplePoints, ray_length, ray_number)  # **************
+        try:
+            raysWithBuildings = gp.sjoin(rays, polys[j], op="intersects")
+        except:
+            print("An exception has occured: there were not enough bins which contained buildings")
+            continue
+        rays = rays.drop(raysWithBuildings.index.values.tolist())
+        tree_list = list(rays['geometry']) + list(street['geometry'])
+        strtree = STRtree(tree_list)
+        pbf.accumulate_counts(strtree, street, 7)
+        for k in street.index:
+            grids[j].at[k, 'count'] = street.at[k, 'count']
+        if i < 10:  # saves images of the plots of data for first 10 iterations
+            ax = x.plot()
+            scheme = mc.Quantiles(street['count'], k=20)
+            gplt.choropleth(street, ax=ax, hue='count', legend=True, scheme=scheme, cmap="jet",
+                            legend_kwargs={'bbox_to_anchor': (1, 0.9)})
+            plt.savefig('../datasets_and_generators/ANN_trainimages/x_' + str(i) + '.png')
+            plt.close()
 
     '''
     part 4: concatenates data to MASTER training data files 
 
     ATTENTION: when changing this file DO NOT immediately concatenate
-    generated data to MASTER files, use a temporary file until it is 
-    certain that the data is compatible with the rest of the data set
+    generated data to MASTER files, use a temporary json file by changing 
+    the file name below until it is certain that the data is compatible 
+    with the rest of the data set
     -compatibility involves: the data being the same shape (xpix & ypix),
-    and that format it is being saved in is consistent; refer to functions 
+    and that the format it is being saved in is consistent; refer to functions 
     grabANNdata() and append_to_json().
     '''
-    append_to_json(grabANNdata(grid), '../datasets_and_generators/ANN_trainingdata_MASTER.json')
+    append_to_json(grabANNdata(grids[0]), '../datasets_and_generators/ANN_trainingdata_MASTER.json')

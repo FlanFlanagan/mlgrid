@@ -10,6 +10,11 @@ to fix it.
 
 It places the files contents into a list, removes items based on
 chosen indices, and replaces file contents with new list.
+
+Do Not Use on CNN datasets... Having two different 
+files for the CNN datasets means that if one file is changed it completely
+throws off the alignment of the two datasets (something that should be mitigated
+later on if desired)
 '''
 
 

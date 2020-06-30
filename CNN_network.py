@@ -44,7 +44,7 @@ class CNN(object):
     def loaddata_and_run(self, images_tr, labels_tr, images_te, labels_te):
         verbose = 1  # 0==no output, 1=accuracy/loss output, 2=progress bar output
 
-        # Load data - #TODO eventually this should call a database of our own
+        # Load data - #TODO eventually this should call a database of our own that contains all the data
         # (images_train, labels_train), (images_test, labels_test) = mnist.load_data()
 
         images_train, labels_train, images_test, labels_test = images_tr, labels_tr, images_te, labels_te
@@ -94,7 +94,6 @@ class CNN(object):
         dataset_test = dataset_test.cache()
         dataset_test = dataset_test.prefetch(tf.data.experimental.AUTOTUNE)
 
-        ## This is the baseline model. Only modify it after copying it to cells further below.
         num_kernels = 3  # originally 3
         dense_layer_neurons = 64  # originally 64
         kernels_size = (3, 3)  # originally 3,3
@@ -120,14 +119,12 @@ class CNN(object):
 
         ])
 
-        # Do not change any arguments in the call to model.compile()
         model.compile(
             loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
             optimizer=tf.keras.optimizers.Adam(0.001), #TODO: determine appropriate optimizer -> https://keras.io/api/optimizers/
             metrics=['accuracy'],
         )
 
-        # Do not change any arguments in the call to model.fit()
         epochs = 30  # originally 30
         t = time.time()
         history = model.fit(dataset_train,
