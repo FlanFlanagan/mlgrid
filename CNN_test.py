@@ -27,7 +27,7 @@ def read_data_set():
     labels = np.array(list(masterlabels))
     # split data
     n = len(masterlist)
-    train_n = int(n * 0.7)  # indicate percentage of the data to be used in the training set here
+    train_n = int(n * 0.5)  # indicate percentage of the data to be used in the training set here
     images_train = masterarray[:(train_n)]
     images_test = masterarray[train_n:]
     labels_train = labels[:(train_n)]
@@ -120,7 +120,7 @@ def testCNN(model, num_pix):
     for file in os.listdir(directory):
         filename.append(os.fsdecode(file))
     for i in filename:
-        test_imgs.append(prepare('CNN_testimages/' + str(i) + '', num_pix))  # 'CNN_testimages/poly6_1.jpg'
+        test_imgs.append(prepare('datasets_and_generators/CNN_testimages/' + str(i) + '', num_pix))  # 'CNN_testimages/poly6_1.jpg'
 
     # report outcomes
     prediction = []
@@ -136,11 +136,11 @@ import CNN_network
 images_train, labels_train, images_test, labels_test = read_data_set()  # reads in data
 CNN = CNN_network.CNN()
 
-# trainedmodel, numpix = CNN.loaddata_and_run(images_train, labels_train, images_test, labels_test) #trains model: comment out to use already trained model
+trainedmodel, numpix = CNN.loaddata_and_run(images_train, labels_train, images_test, labels_test) #trains model: comment out to use already trained model
 
 # use code below to use model that is already trained
-numpix = 39
-trainedmodel = tf.keras.models.load_model("CNN_model.model")  # uncomment these to use already trained model
+# numpix = 39
+# trainedmodel = tf.keras.models.load_model("CNN_model.model")  # uncomment these to use already trained model
 
 # test model by predicting image contents
 testCNN(trainedmodel, numpix)
