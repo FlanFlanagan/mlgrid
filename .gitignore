@@ -1,0 +1,8 @@
+# Python cache
+__pycache__/
+# idea
+.idea/
+# .png s
+#*.png
+#MASTER data sets
+*_MASTER.json
