@@ -388,7 +388,6 @@ for i in range(range_size):
             poly = Polygon(((xs[x], ys[y]), (xs[x], ys[y + 1]), (xs[x + 1], ys[y + 1]), (xs[x + 1], ys[y])))
             grid.append(poly)
     grids.append(gp.GeoDataFrame(geometry=grid))
-    grid.remove()
 
     '''
     part 3: this part is just a portion of part three for 
